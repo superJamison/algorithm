@@ -1,13 +1,7 @@
 package com.jms;
 
 import com.jms.printer.BinaryTrees;
-import com.jms.tree.AVLTree;
-import com.jms.tree.BST;
-import com.jms.tree.BinaryTree;
 import com.jms.tree.RBTree;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Jamison
