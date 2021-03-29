@@ -13,6 +13,8 @@
       <module fileurl="file://$PROJECT_DIR$/06_AVL树/06_AVL树.iml" filepath="$PROJECT_DIR$/06_AVL树/06_AVL树.iml" />
       <module fileurl="file://$PROJECT_DIR$/07_红黑树/07_红黑树.iml" filepath="$PROJECT_DIR$/07_红黑树/07_红黑树.iml" />
       <module fileurl="file://$PROJECT_DIR$/08_集合/08_集合.iml" filepath="$PROJECT_DIR$/08_集合/08_集合.iml" />
+      <module fileurl="file://$PROJECT_DIR$/09_映射/09_映射.iml" filepath="$PROJECT_DIR$/09_映射/09_映射.iml" />
+      <module fileurl="file://$PROJECT_DIR$/10_哈希表/10_哈希表.iml" filepath="$PROJECT_DIR$/10_哈希表/10_哈希表.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/算法.iml" filepath="$PROJECT_DIR$/.idea/算法.iml" />
     </modules>
   </component>
