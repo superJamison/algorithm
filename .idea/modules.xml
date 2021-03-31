@@ -15,6 +15,7 @@
       <module fileurl="file://$PROJECT_DIR$/08_集合/08_集合.iml" filepath="$PROJECT_DIR$/08_集合/08_集合.iml" />
       <module fileurl="file://$PROJECT_DIR$/09_映射/09_映射.iml" filepath="$PROJECT_DIR$/09_映射/09_映射.iml" />
       <module fileurl="file://$PROJECT_DIR$/10_哈希表/10_哈希表.iml" filepath="$PROJECT_DIR$/10_哈希表/10_哈希表.iml" />
+      <module fileurl="file://$PROJECT_DIR$/11_堆/11_堆.iml" filepath="$PROJECT_DIR$/11_堆/11_堆.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/算法.iml" filepath="$PROJECT_DIR$/.idea/算法.iml" />
     </modules>
   </component>
