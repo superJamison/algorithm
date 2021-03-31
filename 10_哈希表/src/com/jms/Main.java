@@ -102,7 +102,7 @@ public class Main {
     }
 
     static void test1() {
-        String filepath = "D:\\study\\java\\资料\\算法\\jdk-src\\java\\util";
+        String filepath = "D:\\study\\java\\资料\\算法\\jdk-src\\java\\util\\concurrent";
         FileInfo fileInfo = Files.read(filepath, null);
         String[] words = fileInfo.words();
 
@@ -112,7 +112,7 @@ public class Main {
 
 //        test1Map(new TreeMap<>(), words);
         test1Map(new HashMap<>(), words);
-//        test1Map(new LinkedHashMap<>(), words);
+        test1Map(new LinkedHashMap<>(), words);
         /**
          * 总行数：62399
          * 单词总数：256149
@@ -179,27 +179,27 @@ public class Main {
         map.put("rose", 2);
         map.put("jim", 3);
         map.put("jake", 4);
-//        map.remove("jack");
-//        map.remove("jim");
+        map.remove("jack");
+        map.remove("jim");
         for (int i = 1; i <= 10; i++) {
             map.put("test" + i, i);
             map.put(new Key(i), i);
         }
-//        for (int i = 5; i <= 7; i++) {
-//            Asserts.test(map.remove(new Key(i)) == i);
-//        }
+        for (int i = 5; i <= 7; i++) {
+            Asserts.test(map.remove(new Key(i)) == i);
+        }
         for (int i = 1; i <= 3; i++) {
             map.put(new Key(i), i + 5);
         }
-//        Asserts.test(map.size() == 19);
-//        Asserts.test(map.get(new Key(1)) == 6);
-//        Asserts.test(map.get(new Key(2)) == 7);
-//        Asserts.test(map.get(new Key(3)) == 8);
-//        Asserts.test(map.get(new Key(4)) == 4);
-//        Asserts.test(map.get(new Key(5)) == null);
-//        Asserts.test(map.get(new Key(6)) == null);
-//        Asserts.test(map.get(new Key(7)) == null);
-//        Asserts.test(map.get(new Key(8)) == 8);
+        Asserts.test(map.size() == 19);
+        Asserts.test(map.get(new Key(1)) == 6);
+        Asserts.test(map.get(new Key(2)) == 7);
+        Asserts.test(map.get(new Key(3)) == 8);
+        Asserts.test(map.get(new Key(4)) == 4);
+        Asserts.test(map.get(new Key(5)) == null);
+        Asserts.test(map.get(new Key(6)) == null);
+        Asserts.test(map.get(new Key(7)) == null);
+        Asserts.test(map.get(new Key(8)) == 8);
         map.traversal(new Map.Visitor<Object, Integer>() {
             public boolean visit(Object key, Integer value) {
                 System.out.println(key + "_" + value);
@@ -238,7 +238,13 @@ public class Main {
 //        test2(new HashMap<>());
 //        test3(new HashMap<>());
 //        test4(new HashMap<>());
-        test4(new LinkedHashMap<>());
+//        test4(new LinkedHashMap<>());
 //        test5(new HashMap<>());
+
+        test1();
+        test2(new LinkedHashMap<>());
+        test3(new LinkedHashMap<>());
+        test4(new LinkedHashMap<>());
+        test5(new LinkedHashMap<>());
     }
 }

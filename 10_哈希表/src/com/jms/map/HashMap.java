@@ -121,7 +121,7 @@ public class HashMap<K, V> implements Map<K, V>{
             parentNode.left = newNode;
         }
         size++;
-        afterPut(newNode);
+        fixAfterPut(newNode);
         return null;
     }
 
@@ -210,7 +210,7 @@ public class HashMap<K, V> implements Map<K, V>{
             parentNode.left = newNode;
         }
 
-        afterPut(newNode);
+        fixAfterPut(newNode);
     }
 
     private int compare(K k1, K k2, int h1, int h2) {
@@ -426,7 +426,7 @@ public class HashMap<K, V> implements Map<K, V>{
 
     public V remove(Node<K, V> node) {
         if (node == null) return null;
-
+        Node<K, V> willNode = node;
         size--;
 
         V oldValue = node.value;
@@ -458,7 +458,7 @@ public class HashMap<K, V> implements Map<K, V>{
             }
 
             // 删除节点之后的处理
-            afterRemove(replacement);
+            fixAfterRemove(replacement);
         } else if (node.parent == null) { // node是叶子节点并且是根节点
             table[index] = null;
         } else { // node是叶子节点，但不是根节点
@@ -469,13 +469,17 @@ public class HashMap<K, V> implements Map<K, V>{
             }
 
             // 删除节点之后的处理
-            afterRemove(node);
+            fixAfterRemove(node);
         }
+
+        afterRemove(willNode, node);
 
         return oldValue;
     }
 
-    private void afterRemove(Node<K, V> node) {
+    protected void afterRemove(Node<K, V> willNode, Node<K, V> removeNode) { }
+
+    private void fixAfterRemove(Node<K, V> node) {
         // 如果删除的节点是红色
         // 或者 用以取代删除节点的子节点是红色
         if (isRed(node)) {
@@ -506,7 +510,7 @@ public class HashMap<K, V> implements Map<K, V>{
                 black(parent);
                 red(sibling);
                 if (parentBlack) {
-                    afterRemove(parent);
+                    fixAfterRemove(parent);
                 }
             } else { // 兄弟节点至少有1个红色子节点，向兄弟节点借元素
                 // 兄弟节点的左边是黑色，兄弟要先旋转
@@ -536,7 +540,7 @@ public class HashMap<K, V> implements Map<K, V>{
                 black(parent);
                 red(sibling);
                 if (parentBlack) {
-                    afterRemove(parent);
+                    fixAfterRemove(parent);
                 }
             } else { // 兄弟节点至少有1个红色子节点，向兄弟节点借元素
                 // 兄弟节点的左边是黑色，兄弟要先旋转
@@ -601,7 +605,7 @@ public class HashMap<K, V> implements Map<K, V>{
         return node.parent;
     }
 
-    private void afterPut(Node<K, V> node) {
+    private void fixAfterPut(Node<K, V> node) {
         Node<K, V> parent = node.parent;
         if (parent == null) {//添加的节点没有父节点，即添加的是root节点
             black(node);
@@ -621,7 +625,7 @@ public class HashMap<K, V> implements Map<K, V>{
             black(uncle);
             black(parent);
             //把祖父节点当做新添加的节点
-            afterPut(red(grand));
+            fixAfterPut(red(grand));
             return;
         }
 
