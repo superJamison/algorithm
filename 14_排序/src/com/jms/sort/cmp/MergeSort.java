@@ -1,4 +1,6 @@
-package com.jms.sort;
+package com.jms.sort.cmp;
+
+import com.jms.sort.Sort;
 
 /**
  * 归并排序
@@ -9,7 +11,6 @@ package com.jms.sort;
  */
 public class MergeSort<T extends Comparable<T>> extends Sort<T> {
     private T[] leftArray;
-
     @Override
     protected void sort() {
         leftArray = (T[]) new Comparable[arrays.length >> 1];

@@ -1,4 +1,4 @@
-package com.jms.sort;
+package com.jms.sort.cmp;
 
 import com.jms.tools.Asserts;
 

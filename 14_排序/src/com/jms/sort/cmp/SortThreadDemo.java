@@ -1,4 +1,4 @@
-package com.jms.sort;
+package com.jms.sort.cmp;
 
 class SortThread extends Thread{
 

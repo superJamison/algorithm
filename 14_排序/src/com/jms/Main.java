@@ -1,6 +1,7 @@
 package com.jms;
 
 import com.jms.sort.*;
+import com.jms.sort.cmp.*;
 import com.jms.tools.Asserts;
 import com.jms.tools.Integers;
 import com.jms.tools.Times;
@@ -29,18 +30,23 @@ public class Main {
 //        test1();
 
         Integer[] arrays = Integers.random(10000, 1, 1000000);
+//        Integer[] arrays = {7,3,5,8,6,7,4,5};
+//        Integer[] arrays = {126,69,593,23,6,89,54,8};
+
         sort(arrays,
                 new HeadSort<Integer>(),
-//                new SelectionSort<Integer>(),
-                new InsertionSort1<Integer>(),
-                new InsertionSort2<Integer>(),
+//                new CountingSort()
+//                new RadixSort()
+                new SelectionSort<Integer>(),
+//                new InsertionSort1<Integer>(),
+//                new InsertionSort2<Integer>(),
                 new InsertionSort3<Integer>(),
                 new MergeSort<Integer>(),
-                new SellSort<>(),
-                new QuickSort<Integer>()
+                new ShellSort<>(),
+                new QuickSort<Integer>(),
 //                new BubbleSort<Integer>(),
 //                new BubbleSort1<Integer>(),
-//                new BubbleSort2<Integer>()
+                new BubbleSort2<Integer>()
         );
     }
 

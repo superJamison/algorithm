@@ -1,4 +1,6 @@
-package com.jms.sort;
+package com.jms.sort.cmp;
+
+import com.jms.sort.Sort;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -9,7 +11,7 @@ import java.util.List;
  * @version 1.0
  * @date 2021/4/4 20:22
  */
-public class SellSort<T extends Comparable<T>> extends Sort<T> {
+public class ShellSort<T extends Comparable<T>> extends Sort<T> {
     @Override
     protected void sort() {
         List<Integer> stepSequence = sedgewickStepSequence();

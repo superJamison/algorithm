@@ -1,4 +1,6 @@
-package com.jms.sort;
+package com.jms.sort.cmp;
+
+import com.jms.sort.Sort;
 
 /**
  * 选择 排序   是稳定的排序  平均复杂度：O(nlogn)  空间：O(1)
@@ -6,7 +8,7 @@ package com.jms.sort;
  * @version 1.0
  * @date 2021/4/2 20:51
  */
-public class SelectionSort<T extends Comparable<T>> extends Sort<T>{
+public class SelectionSort<T extends Comparable<T>> extends Sort<T> {
 
     @Override
     protected void sort() {

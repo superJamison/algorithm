@@ -1,4 +1,6 @@
-package com.jms.sort;
+package com.jms.sort.cmp;
+
+import com.jms.sort.Sort;
 
 /**
  * 插入排序：最坏、平均时间复杂度是O(n^2)  最好时间复杂度是：O(n)  稳定性：稳定   空间复杂度：O(1)

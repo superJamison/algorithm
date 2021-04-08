@@ -1,4 +1,6 @@
-package com.jms.sort;
+package com.jms.sort.cmp;
+
+import com.jms.sort.Sort;
 
 import java.util.Map;
 
