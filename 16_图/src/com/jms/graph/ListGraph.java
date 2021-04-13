@@ -1,5 +1,6 @@
 package com.jms.graph;
 
+import com.jms.MinHeap;
 import com.jms.Visitor;
 
 import java.util.*;
@@ -164,17 +165,126 @@ public class ListGraph<K, T> implements Graph<K, T> {
         Vertex<K, T> vertex = vertices.get(t);
         if (vertex == null) return;
 
-        dfs(vertex, new HashSet<Vertex<K, T>>(), visitor);
+        Stack<Vertex<K, T>> stack = new Stack<>();
+        Set<Vertex<K, T>> visitedSet = new HashSet<>();
+
+        //首先访问起点
+        stack.push(vertex);
+        visitedSet.add(vertex);
+        visitor.visit(vertex.value);
+
+        while (!stack.isEmpty()){
+            //弹出栈顶元素
+            Vertex<K, T> ktVertex = stack.pop();
+
+            //遍历元素的outEdges出度
+            for (Edge<K, T> outEdge : ktVertex.outEdges) {
+
+                //检查记录已经访问的节点的栈中是否已经有这个to了
+                if (visitedSet.contains(outEdge.to)) continue;
+
+                //将from和to入栈，并且将to添加到记录已经访问的节点的栈中，以及访问to的节点内容
+                stack.push(outEdge.from);
+                stack.push(outEdge.to);
+                visitedSet.add(outEdge.to);
+                visitor.visit(outEdge.to.value);
+
+                //遍历出一个就退出循环
+                break;
+            }
+        }
     }
 
-    private void dfs(Vertex<K, T> vertex, Set<Vertex<K, T>> visitorVertex, Visitor<T> visitor) {
+    @Override
+    public List<T> topologicalSort() {
+        ArrayList<T> list = new ArrayList<>();
+        Queue<Vertex<K, T>> queue = new LinkedList<>();
+        Map<Vertex<K, T>, Integer> ins = new HashMap<>();
+
+        //初始化参数
+        vertices.forEach((T t, Vertex<K, T> vertex) -> {
+            int size = vertex.inEdges.size();
+            if (size == 0){
+                queue.offer(vertex);
+            }else {
+                ins.put(vertex, size);
+            }
+        });
+
+        while (!queue.isEmpty()){
+            Vertex<K, T> vertex = queue.poll();
+
+            //将取出的节点放入的返回结果中
+            list.add(vertex.value);
+
+            //遍历出度，查看to的入度是否为0
+            for (Edge<K, T> outEdge : vertex.outEdges) {
+                int toIn = ins.get(outEdge.to) - 1;
+                if (toIn == 0) {
+                    queue.offer(outEdge.to);
+                }else {
+                    ins.put(outEdge.to, toIn);
+                }
+            }
+
+        }
+
+        return list;
+    }
+
+    @Override
+    public Set<EdgeInfo<K, T>> mst() {
+        return prim();
+    }
+
+    private Comparator<Edge<K, T>> edgeComparator = (Edge<K, T> e1, Edge<K, T> e2) -> {
+
+        return 0;
+    };
+
+    private Set<EdgeInfo<K, T>> prim() {
+        Iterator<Vertex<K, T>> vertexIterator = vertices.values().iterator();
+        if (!vertexIterator.hasNext()) return null;
+
+        Set<EdgeInfo<K, T>> edgeInfos = new HashSet<>();
+        Set<Vertex<K, T>> visitedVertex = new HashSet<>();
+
+        Vertex<K, T> vertex = vertexIterator.next();
+        visitedVertex.add(vertex);
+        MinHeap<Edge<K, T>> heap = new MinHeap<>(vertex.outEdges, edgeComparator);
+
+        //取出堆顶元素，即是权重最小的边
+        while (!heap.isEmpty()){
+            Edge<K, T> edge = heap.get();
+            visitedVertex.add(edge.to);
+
+        }
+
+        return edgeInfos;
+    }
+
+    private Set<EdgeInfo<K, T>> kruskal() {
+        return null;
+    }
+
+
+    @Override
+    public void dfs2(T t, Visitor<T> visitor) {
+        if (visitor == null) return;
+        Vertex<K, T> vertex = vertices.get(t);
+        if (vertex == null) return;
+
+        dfs2(vertex, new HashSet<Vertex<K, T>>(), visitor);
+    }
+
+    private void dfs2(Vertex<K, T> vertex, Set<Vertex<K, T>> visitorVertex, Visitor<T> visitor) {
 //        System.out.println(vertex.value);
         if (visitor.visit(vertex.value)) return;
         visitorVertex.add(vertex);
 
         for (Edge<K, T> outEdge : vertex.outEdges) {
             if (visitorVertex.contains(outEdge.to)) continue;
-            dfs(outEdge.to, visitorVertex, visitor);
+            dfs2(outEdge.to, visitorVertex, visitor);
         }
     }
 

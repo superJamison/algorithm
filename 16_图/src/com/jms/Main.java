@@ -11,15 +11,32 @@ import com.jms.graph.ListGraph;
 public class Main {
     public static void main(String[] args) {
 //        test();
-        testUnDfs();
+//        testUnDfs();
+        testTopo();
     }
 
+    private static void testTopo() {
+        Graph<Double, Object> graph = directedGraph(Data.TOPO);
+        for (Object o : graph.topologicalSort()) {
+            System.out.println(o);
+        }
+    }
+
+
     private static void testUnDfs() {
-        Graph<Double, Object> graph = undirectedGraph(Data.DFS_01);
-        graph.dfs(1, new Visitor<Object>() {
+        Graph<Double, Object> graph = directedGraph(Data.DFS_02);
+        graph.dfs2("a", new Visitor<Object>() {
             @Override
             public boolean visit(Object o) {
-                System.out.println(o);
+                System.out.print(o + "_");
+                return false;
+            }
+        });
+        System.out.println();
+        graph.dfs("a", new Visitor<Object>() {
+            @Override
+            public boolean visit(Object o) {
+                System.out.print(o + "_");
                 return false;
             }
         });
@@ -47,7 +64,7 @@ public class Main {
 //        graph.removeEdge("V0", "V4");
 //        graph.removeVertex("V0");
 //        graph.bfs("V1");
-        graph.dfs("V1", new Visitor<String>() {
+        graph.dfs2("V1", new Visitor<String>() {
             @Override
             public boolean visit(String s) {
                 System.out.println(s);
