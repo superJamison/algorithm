@@ -1,10 +1,7 @@
 package com.jms.graph;
 
 import com.jms.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sun.security.provider.certpath.Vertex;
 
 import java.util.List;
@@ -16,41 +13,69 @@ import java.util.concurrent.Semaphore;
  * @version 1.0
  * @date 2021/4/10 21:16
  */
-public interface Graph<K, T> {
+public abstract class Graph<K, T> {
+    protected WeightManager<K> weightManager;
+
+    public Graph(WeightManager<K> weightManager) {
+        this.weightManager = weightManager;
+    }
+
     //返回图的所有节点的数量
-    int verticesSize();
+    public abstract int verticesSize();
     //返回图的边总数
-    int edgesSize();
+    public abstract int edgesSize();
 
     //添加一个节点
-    void addVertex(T t);
+    public abstract void addVertex(T t);
     //添加一条有权重的边
-    void addEdge(T from, T to, K weight);
+    public abstract void addEdge(T from, T to, K weight);
     //添加一个无权重的边
-    void addEdge(T from, T to);
+    public abstract void addEdge(T from, T to);
 
     //删除一个节点
-    void removeVertex(T t);
+    public abstract void removeVertex(T t);
     //删除一条边
-    void removeEdge(T from, T to);
+    public abstract void removeEdge(T from, T to);
     //广度优先搜索
-    void bfs(T t, Visitor<T> visitor);
+    public abstract void bfs(T t, Visitor<T> visitor);
     //深度优先搜索
-    void dfs2(T t, Visitor<T> visitor);
-    void dfs(T t, Visitor<T> visitor);
+    public abstract void dfs2(T t, Visitor<T> visitor);
+    public abstract void dfs(T t, Visitor<T> visitor);
 
     //拓扑排序
-    List<T> topologicalSort();
+    public abstract List<T> topologicalSort();
 
     //K 代表权重
-    Set<EdgeInfo<K, T>> mst();
+    public abstract Set<EdgeInfo<K, T>> mst();
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    class EdgeInfo<K, T>{
-        T from;
-        T to;
-        K weight;
+    //K 权值
+    public interface WeightManager<K>{
+        //比较权值大小
+        int compare(K w1, K w2);
+
+        //权值相加
+        K add(K w1, K w2);
+    }
+
+    @Setter@Getter
+    public static class EdgeInfo<K, T>{
+        private T from;
+        private T to;
+        private K weight;
+
+        public EdgeInfo(T from, T to, K weight) {
+            this.from = from;
+            this.to = to;
+            this.weight = weight;
+        }
+
+        @Override
+        public String toString() {
+            return "EdgeInfo{" +
+                    "from=" + from +
+                    ", to=" + to +
+                    ", weight=" + weight +
+                    '}';
+        }
     }
 }

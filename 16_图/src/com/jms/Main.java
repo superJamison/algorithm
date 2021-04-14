@@ -3,6 +3,8 @@ package com.jms;
 import com.jms.graph.Graph;
 import com.jms.graph.ListGraph;
 
+import java.util.Set;
+
 /**
  * @author  Jamison
  * @date  2021/4/10 21:15
@@ -12,7 +14,29 @@ public class Main {
     public static void main(String[] args) {
 //        test();
 //        testUnDfs();
-        testTopo();
+//        testTopo();
+        testMst();
+    }
+
+    public static Graph.WeightManager<Double> weightManager = new Graph.WeightManager<Double>() {
+        @Override
+        public int compare(Double w1, Double w2) {
+            return w1.compareTo(w2);
+        }
+
+        @Override
+        public Double add(Double w1, Double w2) {
+            return w1 + w2;
+        }
+    };
+
+    private static void testMst() {
+        Graph<Double, Object> graph = undirectedGraph(Data.MST_01);
+        Set<Graph.EdgeInfo<Double, Object>> mst =
+                graph.mst();
+        for (Graph.EdgeInfo<Double, Object> info : mst) {
+            System.out.println(info);
+        }
     }
 
     private static void testTopo() {
@@ -52,25 +76,25 @@ public class Main {
     }
 
     private static void test() {
-        Graph<Integer, String> graph = new ListGraph<>();
-
-        graph.addEdge("V1", "V0", 9);
-        graph.addEdge("V1", "V2", 3);
-        graph.addEdge("V2", "V0", 2);
-        graph.addEdge("V2", "V3", 5);
-        graph.addEdge("V3", "V4", 1);
-        graph.addEdge("V0", "V4", 6);
-
-//        graph.removeEdge("V0", "V4");
-//        graph.removeVertex("V0");
-//        graph.bfs("V1");
-        graph.dfs2("V1", new Visitor<String>() {
-            @Override
-            public boolean visit(String s) {
-                System.out.println(s);
-                return false;
-            }
-        });
+//        Graph<Integer, String> graph = new ListGraph<>();
+//
+//        graph.addEdge("V1", "V0", 9);
+//        graph.addEdge("V1", "V2", 3);
+//        graph.addEdge("V2", "V0", 2);
+//        graph.addEdge("V2", "V3", 5);
+//        graph.addEdge("V3", "V4", 1);
+//        graph.addEdge("V0", "V4", 6);
+//
+////        graph.removeEdge("V0", "V4");
+////        graph.removeVertex("V0");
+////        graph.bfs("V1");
+//        graph.dfs2("V1", new Visitor<String>() {
+//            @Override
+//            public boolean visit(String s) {
+//                System.out.println(s);
+//                return false;
+//            }
+//        });
 
 //        graph.print();
     }
@@ -79,7 +103,7 @@ public class Main {
      * 有向图
      */
     private static Graph<Double, Object> directedGraph(Object[][] data) {
-        Graph<Double, Object> graph = new ListGraph<>();
+        Graph<Double, Object> graph = new ListGraph<>(weightManager);
         for (Object[] edge : data) {
             if (edge.length == 1) {
                 graph.addVertex(edge[0]);
@@ -99,7 +123,7 @@ public class Main {
      * @return
      */
     private static Graph<Double, Object> undirectedGraph(Object[][] data) {
-        Graph<Double, Object> graph = new ListGraph<>();
+        Graph<Double, Object> graph = new ListGraph<>(weightManager);
         for (Object[] edge : data) {
             if (edge.length == 1) {
                 graph.addVertex(edge[0]);

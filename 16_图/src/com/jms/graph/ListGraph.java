@@ -1,6 +1,7 @@
 package com.jms.graph;
 
 import com.jms.MinHeap;
+import com.jms.UnionFind;
 import com.jms.Visitor;
 
 import java.util.*;
@@ -12,10 +13,14 @@ import java.util.*;
  * @version 1.0
  * @date 2021/4/10 23:06
  */
-public class ListGraph<K, T> implements Graph<K, T> {
+public class ListGraph<K, T> extends Graph<K, T> {
     private Map<T, Vertex<K, T>> vertices = new HashMap<>();
     private Set<Edge<K, T>> edges = new HashSet<>();
     private Visitor<Vertex<K, T>> visitor;
+
+    public ListGraph(WeightManager<K> weightManager) {
+        super(weightManager);
+    }
 
     @Override
     public int edgesSize() {
@@ -234,12 +239,12 @@ public class ListGraph<K, T> implements Graph<K, T> {
 
     @Override
     public Set<EdgeInfo<K, T>> mst() {
-        return prim();
+        return kruskal();
     }
 
     private Comparator<Edge<K, T>> edgeComparator = (Edge<K, T> e1, Edge<K, T> e2) -> {
 
-        return 0;
+        return weightManager.compare(e1.weight, e2.weight);
     };
 
     private Set<EdgeInfo<K, T>> prim() {
@@ -249,22 +254,47 @@ public class ListGraph<K, T> implements Graph<K, T> {
         Set<EdgeInfo<K, T>> edgeInfos = new HashSet<>();
         Set<Vertex<K, T>> visitedVertex = new HashSet<>();
 
+        //初始化数据
         Vertex<K, T> vertex = vertexIterator.next();
         visitedVertex.add(vertex);
         MinHeap<Edge<K, T>> heap = new MinHeap<>(vertex.outEdges, edgeComparator);
 
         //取出堆顶元素，即是权重最小的边
-        while (!heap.isEmpty()){
-            Edge<K, T> edge = heap.get();
+        int verticesSize = vertices.size() - 1;
+        while (!heap.isEmpty() && edgeInfos.size() < verticesSize){
+            Edge<K, T> edge = heap.remove();
+            if (visitedVertex.contains(edge.to)) continue;
+            edgeInfos.add(edge.info());
             visitedVertex.add(edge.to);
-
+            heap.addAll(edge.to.outEdges);
         }
 
         return edgeInfos;
     }
 
     private Set<EdgeInfo<K, T>> kruskal() {
-        return null;
+        int edgesSize = vertices.size() - 1;
+        if (edgesSize < 0){
+            return null;
+        }
+
+        //初始化并查集，将每一个节点看成不同的集合
+        UnionFind<Vertex<K, T>> vertexUnionFind = new UnionFind<>();
+        vertices.forEach((T t, Vertex<K, T> vertex) -> {
+            vertexUnionFind.makeSet(vertex);
+        });
+
+        //将所有的边放入小顶堆中，不断的取出权值最小的边，判断是否会构成环，若构成则放弃这条边，否则就加入结果集中
+        Set<EdgeInfo<K, T>> edgeInfos = new HashSet<>();
+        MinHeap<Edge<K, T>> heap = new MinHeap<>(edges, edgeComparator);
+        while (!heap.isEmpty() && edgeInfos.size() < edgesSize){
+            Edge<K, T> edge = heap.remove();
+            if (vertexUnionFind.isSame(edge.from, edge.to)) continue;
+            edgeInfos.add(edge.info());
+            vertexUnionFind.union(edge.from, edge.to);
+        }
+
+        return edgeInfos;
     }
 
 
@@ -354,6 +384,10 @@ public class ListGraph<K, T> implements Graph<K, T> {
                     ", to=" + to +
                     ", weight=" + weight +
                     '}';
+        }
+
+        public EdgeInfo<K, T> info() {
+            return new EdgeInfo<K, T>(from.value, to.value, weight);
         }
     }
 
