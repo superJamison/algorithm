@@ -242,6 +242,108 @@ public class ListGraph<K, T> extends Graph<K, T> {
         return kruskal();
     }
 
+    @Override
+    public Map<T, PathInfo<K, T>> shortestPath(T begin) {
+        Vertex<K, T> beginVertex = vertices.get(begin);
+        if (beginVertex == null){
+            return null;
+        }
+
+        //初始化最短路径map
+        Map<T, PathInfo<K, T>> selectedPaths = new HashMap<>();
+
+        // <要计算的其他节点， begin到其他节点的最短路径>
+        Map<Vertex<K, T>, PathInfo<K, T>> paths = new HashMap<>();
+        for (Edge<K, T> outEdge : beginVertex.outEdges) {
+            PathInfo<K, T> ktPathInfo = new PathInfo<>();
+            ktPathInfo.paths.add(outEdge.info());
+            ktPathInfo.setWeight(outEdge.weight);
+            paths.put(outEdge.to, ktPathInfo);
+        }
+
+        while (!paths.isEmpty()){
+            Map.Entry<Vertex<K, T>, PathInfo<K, T>> minVertex = getMinPath(paths);
+            //minVertex离开桌面
+            selectedPaths.put(minVertex.getKey().value, minVertex.getValue());
+            paths.remove(minVertex.getKey());
+            //对minVertex的outEdges进行松弛操作
+            for (Edge<K, T> outEdge : minVertex.getKey().outEdges) {
+                //如果outEdge.to已经离开桌面了，就没必要更新路径了
+                if (selectedPaths.containsKey(outEdge.to.value) || outEdge.to.equals(beginVertex)) continue; // || outEdge.to.value.equals(beginVertex.value)
+                //旧的最短路径
+                PathInfo<K, T> oldPathInfo = paths.get(outEdge.to);
+//                K oldWeight = oldPathInfo.weight;
+                //新的可选路径，minVertex.getValue() + 边的路径
+                K newWeight = weightManager.add(minVertex.getValue().weight, outEdge.weight);
+                if (oldPathInfo == null || weightManager.compare(newWeight, oldPathInfo.weight) < 0){
+                    PathInfo<K, T> ktPathInfo = new PathInfo<>();
+                    ktPathInfo.weight = newWeight;
+                    //此处不能直接这样赋值，它所赋值的是数组的引用，但是这里需要创建一个新的数组，ktPathInfo.paths = minVertex.getValue().paths
+                    ktPathInfo.paths.addAll(minVertex.getValue().paths);
+                    ktPathInfo.paths.add(outEdge.info());
+                    paths.put(outEdge.to, ktPathInfo);
+                }
+            }
+        }
+//        selectedPaths.remove(begin);
+
+        return selectedPaths;
+    }
+
+//    @Override
+//    public Map<T, K> shortestPath(T begin) {
+//        Vertex<K, T> beginVertex = vertices.get(begin);
+//        if (beginVertex == null){
+//            return null;
+//        }
+//
+//        //初始化最短路径map
+//        Map<T, K> selectedPaths = new HashMap<>();
+//        // <要计算的其他节点， begin到其他节点的最短路径>
+//        Map<Vertex<K, T>, K> paths = new HashMap<>();
+//        for (Edge<K, T> outEdge : beginVertex.outEdges) {
+//            paths.put(outEdge.to, outEdge.weight);
+//        }
+//
+//        while (!paths.isEmpty()){
+//            Map.Entry<Vertex<K, T>, K> minVertex = getMinPath(paths);
+//            //minVertex离开桌面
+//            selectedPaths.put(minVertex.getKey().value, minVertex.getValue());
+//            paths.remove(minVertex.getKey());
+//            //对minVertex的outEdges进行松弛操作
+//            for (Edge<K, T> outEdge : minVertex.getKey().outEdges) {
+//                //如果outEdge.to已经离开桌面了，就没必要更新路径了
+//                if (selectedPaths.containsKey(outEdge.to.value)) continue; // || outEdge.to.value.equals(beginVertex.value)
+//                //旧的最短路径
+//                K oldWeight = paths.get(outEdge.to);
+//                //新的可选路径，minVertex.getValue() + 边的路径
+//                K newWeight = weightManager.add(minVertex.getValue(), outEdge.weight);
+//                if (oldWeight == null || weightManager.compare(newWeight, oldWeight) < 0){
+//                    paths.put(outEdge.to, newWeight);
+//                }
+//            }
+//        }
+//        selectedPaths.remove(begin);
+//
+//        return selectedPaths;
+//    }
+
+    /**
+     * 从paths中挑选一个最短路径出来
+     */
+    private Map.Entry<Vertex<K, T>, PathInfo<K, T>> getMinPath(Map<Vertex<K, T>, PathInfo<K, T>> paths) {
+        Iterator<Map.Entry<Vertex<K, T>, PathInfo<K, T>>> iterator = paths.entrySet().iterator();
+        Map.Entry<Vertex<K, T>, PathInfo<K, T>> min = iterator.next();
+
+        while (iterator.hasNext()){
+            Map.Entry<Vertex<K, T>, PathInfo<K, T>> next = iterator.next();
+            if (weightManager.compare(next.getValue().weight, min.getValue().weight) < 0){
+                min = next;
+            }
+        }
+        return min;
+    }
+
     private Comparator<Edge<K, T>> edgeComparator = (Edge<K, T> e1, Edge<K, T> e2) -> {
 
         return weightManager.compare(e1.weight, e2.weight);

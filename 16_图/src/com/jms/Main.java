@@ -3,6 +3,7 @@ package com.jms;
 import com.jms.graph.Graph;
 import com.jms.graph.ListGraph;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,7 +16,20 @@ public class Main {
 //        test();
 //        testUnDfs();
 //        testTopo();
-        testMst();
+//        testMst();
+        testShortestPath();
+    }
+
+    private static void testShortestPath() {
+        Graph<Double, Object> graph = undirectedGraph(Data.SP);
+        Map<Object, Graph.PathInfo<Double, Object>> a = graph.shortestPath("A");
+        a.forEach((Object o, Graph.PathInfo<Double, Object> pathInfo) -> {
+            System.out.println("A->" + o + ":" + pathInfo.getWeight());
+            for (Graph.EdgeInfo<Double, Object> path : pathInfo.getPaths()) {
+                System.out.println(path);
+            }
+            System.out.println("===============================");
+        });
     }
 
     public static Graph.WeightManager<Double> weightManager = new Graph.WeightManager<Double>() {

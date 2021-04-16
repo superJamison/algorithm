@@ -4,7 +4,9 @@ import com.jms.Visitor;
 import lombok.*;
 import sun.security.provider.certpath.Vertex;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -45,37 +47,30 @@ public abstract class Graph<K, T> {
     //拓扑排序
     public abstract List<T> topologicalSort();
 
-    //K 代表权重
+    //最小生成树，K 代表权重
     public abstract Set<EdgeInfo<K, T>> mst();
+
+    //单源最短路径
+    public abstract Map<T, PathInfo<K, T>> shortestPath(T begin);
 
     //K 权值
     public interface WeightManager<K>{
         //比较权值大小
         int compare(K w1, K w2);
-
         //权值相加
         K add(K w1, K w2);
     }
 
-    @Setter@Getter
+    @Getter @Setter @ToString
+    public static class PathInfo<K, T>{
+        protected K weight;
+        protected List<EdgeInfo<K, T>> paths = new LinkedList<>();
+    }
+
+    @Setter@Getter@AllArgsConstructor@ToString
     public static class EdgeInfo<K, T>{
         private T from;
         private T to;
         private K weight;
-
-        public EdgeInfo(T from, T to, K weight) {
-            this.from = from;
-            this.to = to;
-            this.weight = weight;
-        }
-
-        @Override
-        public String toString() {
-            return "EdgeInfo{" +
-                    "from=" + from +
-                    ", to=" + to +
-                    ", weight=" + weight +
-                    '}';
-        }
     }
 }
