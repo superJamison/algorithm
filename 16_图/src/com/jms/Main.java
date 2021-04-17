@@ -17,14 +17,29 @@ public class Main {
 //        testUnDfs();
 //        testTopo();
 //        testMst();
-        testShortestPath();
+//        testShortestPath();
+        testMultiSp();
+    }
+
+    private static void testMultiSp() {
+        Graph<Double, Object> graph = directedGraph(Data.NEGATIVE_WEIGHT1);
+        Map<Object, Map<Object, Graph.PathInfo<Double, Object>>> objectMapMap =
+                graph.shortestPath();
+        objectMapMap.forEach((Object t1, Map<Object, Graph.PathInfo<Double, Object>> map) -> {
+            System.out.println(t1 + "------------------------>" );
+            map.forEach((Object t2, Graph.PathInfo<Double, Object> pathInfo) -> {
+                System.out.println(t2 + ":" + pathInfo);
+            });
+        });
     }
 
     private static void testShortestPath() {
-        Graph<Double, Object> graph = undirectedGraph(Data.SP);
-        Map<Object, Graph.PathInfo<Double, Object>> a = graph.shortestPath("A");
+        Graph<Double, Object> graph = directedGraph(Data.NEGATIVE_WEIGHT2);
+        int origin = 0;
+        Map<Object, Graph.PathInfo<Double, Object>> a = graph.shortestPath(origin);
+        if (a == null) return;
         a.forEach((Object o, Graph.PathInfo<Double, Object> pathInfo) -> {
-            System.out.println("A->" + o + ":" + pathInfo.getWeight());
+            System.out.println(origin + "->" + o + ":" + pathInfo.getWeight());
             for (Graph.EdgeInfo<Double, Object> path : pathInfo.getPaths()) {
                 System.out.println(path);
             }
@@ -41,6 +56,11 @@ public class Main {
         @Override
         public Double add(Double w1, Double w2) {
             return w1 + w2;
+        }
+
+        @Override
+        public Double zero() {
+            return 0.0;
         }
     };
 

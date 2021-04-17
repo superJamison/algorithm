@@ -53,12 +53,16 @@ public abstract class Graph<K, T> {
     //单源最短路径
     public abstract Map<T, PathInfo<K, T>> shortestPath(T begin);
 
+    //多源最短路径
+    public abstract Map<T, Map<T, PathInfo<K, T>>> shortestPath();
+
     //K 权值
     public interface WeightManager<K>{
         //比较权值大小
         int compare(K w1, K w2);
         //权值相加
         K add(K w1, K w2);
+        K zero();
     }
 
     @Getter @Setter @ToString

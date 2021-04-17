@@ -4,6 +4,7 @@ import com.jms.MinHeap;
 import com.jms.UnionFind;
 import com.jms.Visitor;
 
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -178,7 +179,7 @@ public class ListGraph<K, T> extends Graph<K, T> {
         visitedSet.add(vertex);
         visitor.visit(vertex.value);
 
-        while (!stack.isEmpty()){
+        while (!stack.isEmpty()) {
             //弹出栈顶元素
             Vertex<K, T> ktVertex = stack.pop();
 
@@ -209,14 +210,14 @@ public class ListGraph<K, T> extends Graph<K, T> {
         //初始化参数
         vertices.forEach((T t, Vertex<K, T> vertex) -> {
             int size = vertex.inEdges.size();
-            if (size == 0){
+            if (size == 0) {
                 queue.offer(vertex);
-            }else {
+            } else {
                 ins.put(vertex, size);
             }
         });
 
-        while (!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             Vertex<K, T> vertex = queue.poll();
 
             //将取出的节点放入的返回结果中
@@ -227,7 +228,7 @@ public class ListGraph<K, T> extends Graph<K, T> {
                 int toIn = ins.get(outEdge.to) - 1;
                 if (toIn == 0) {
                     queue.offer(outEdge.to);
-                }else {
+                } else {
                     ins.put(outEdge.to, toIn);
                 }
             }
@@ -244,8 +245,138 @@ public class ListGraph<K, T> extends Graph<K, T> {
 
     @Override
     public Map<T, PathInfo<K, T>> shortestPath(T begin) {
+        return bellmanFord(begin);
+    }
+
+    @Override
+    public Map<T, Map<T, PathInfo<K, T>>> shortestPath() {
+
+        // Map<起点, Map<终点, 起点到终点的最短路径信息>>
+        Map<T, Map<T, PathInfo<K, T>>> paths = new HashMap<>();
+        edges.forEach((Edge<K, T> edge) -> {
+            Map<T, PathInfo<K, T>> map = paths.get(edge.from.value);
+            if (map == null){
+                map = new HashMap<>();
+                paths.put(edge.from.value, map);
+            }
+
+            PathInfo<K, T> pathInfo = new PathInfo<>();
+            pathInfo.weight = edge.weight;
+            pathInfo.paths.add(edge.info());
+            map.put(edge.to.value, pathInfo);
+        });
+
+        // 将每一个点都作为k，改变i和j计算 i到k 和 k到j 之间的最短路径，与 i到j 的最短路径比较
+        vertices.forEach((T t2, Vertex<K, T> v2) -> {
+            vertices.forEach((T t1, Vertex<K, T> v1) -> {
+                vertices.forEach((T t3, Vertex<K, T> v3) -> {
+                    if (t1.equals(t2) || t2.equals(t3) || t1.equals(t3)) return;
+
+                    //v1->v2 计算v1到v2之间的最短路径
+                    PathInfo<K, T> pathInfo12 = getPathInfo( paths, t1, t2);
+                    if(pathInfo12 == null) return;
+
+                    //v2->v3 计算v2到v2之间的最短路径
+                    PathInfo<K, T> pathInfo23 = getPathInfo(paths, t2, t3);
+                    if (pathInfo23 == null) return;
+
+                    //v1->v3 计算v1到v3之间的最短路径
+                    PathInfo<K, T> pathInfo13 = getPathInfo(paths, t1, t3);
+
+                    // 将v1到v2的最短路径和v2到v3的最短路径加起来
+                    K newWeight = weightManager.add(pathInfo12.weight, pathInfo23.weight);
+
+                    // 若v1到v3存在路径，若新路径比原先的路径长度大，则无需更新最短路径
+                    if (pathInfo13 != null && weightManager.compare(newWeight, pathInfo13.weight) >= 0) return;
+
+                    // pathInfo13 == null 表示原先还没有计算v1到v3之间的最短路径
+                    if (pathInfo13 == null) {
+                        pathInfo13 = new PathInfo<>();
+                        paths.get(t1).put(v3.value, pathInfo13);
+                    } else {
+                        pathInfo13.paths.clear();
+                    }
+
+                    // 更新最新的最短路径信息
+                    pathInfo13.weight = newWeight;
+                    pathInfo13.paths.addAll(pathInfo12.paths);
+                    pathInfo13.paths.addAll(pathInfo23.paths);
+
+                });
+            });
+        });
+
+        return paths;
+    }
+
+    // 返回from到to之间的最短路径
+    private PathInfo<K, T> getPathInfo(Map<T, Map<T, PathInfo<K, T>>> paths, T from, T to) {
+        Map<T, PathInfo<K, T>> fromPath = paths.get(from);
+        return fromPath == null ? null : fromPath.get(to);
+    }
+
+    private Map<T, PathInfo<K, T>> bellmanFord(T begin) {
         Vertex<K, T> beginVertex = vertices.get(begin);
-        if (beginVertex == null){
+        if (beginVertex == null) return null;
+
+        //初始化最短路径map
+        Map<T, PathInfo<K, T>> selectedPaths = new HashMap<>();
+        PathInfo<K, T> beginPathInfo = new PathInfo<>();
+        beginPathInfo.weight = weightManager.zero();
+        selectedPaths.put(begin, beginPathInfo);
+
+        // 进行V - 1 次松弛操作
+        int count = vertices.size() - 1;
+        for (int i = 0; i < count; i++) {
+            for (Edge<K, T> edge : edges) {
+                PathInfo<K, T> pathInfo = selectedPaths.get(edge.from.value);
+                if (pathInfo == null) continue;
+                relax(selectedPaths, pathInfo, edge);
+            }
+        }
+
+        // 判断是否有负权环
+        for (Edge<K, T> edge : edges) {
+            PathInfo<K, T> pathInfo = selectedPaths.get(edge.from.value);
+            if (pathInfo == null) continue;
+            if (relax(selectedPaths, pathInfo, edge)) {
+                System.out.println("有负权环！！！");
+                return null;
+            }
+        }
+        selectedPaths.remove(begin);
+
+        return selectedPaths;
+    }
+
+    /**
+     * 松弛操作
+     *
+     * @param paths   存放要松弛的点，还没有离开桌面的点
+     * @param minPath edge 的from 的最短路径信息
+     * @param outEdge 即将要进行松弛的边
+     */
+    private boolean relax(Map<T, PathInfo<K, T>> paths, PathInfo<K, T> minPath, Edge<K, T> outEdge) {
+        //旧的最短路径
+        PathInfo<K, T> oldPathInfo = paths.get(outEdge.to.value);
+//                K oldWeight = oldPathInfo.weight;
+        //新的可选路径，minVertex.getValue() + 边的路径
+        K newWeight = weightManager.add(minPath.weight, outEdge.weight);
+        if (oldPathInfo == null || weightManager.compare(newWeight, oldPathInfo.weight) < 0) {
+            PathInfo<K, T> ktPathInfo = new PathInfo<>();
+            ktPathInfo.weight = newWeight;
+            //此处不能直接这样赋值，它所赋值的是数组的引用，但是这里需要创建一个新的数组，ktPathInfo.paths = minVertex.getValue().paths
+            ktPathInfo.paths.addAll(minPath.paths);
+            ktPathInfo.paths.add(outEdge.info());
+            paths.put(outEdge.to.value, ktPathInfo);
+            return true;
+        }
+        return false;
+    }
+
+    private Map<T, PathInfo<K, T>> dijkstra(T begin) {
+        Vertex<K, T> beginVertex = vertices.get(begin);
+        if (beginVertex == null) {
             return null;
         }
 
@@ -261,7 +392,7 @@ public class ListGraph<K, T> extends Graph<K, T> {
             paths.put(outEdge.to, ktPathInfo);
         }
 
-        while (!paths.isEmpty()){
+        while (!paths.isEmpty()) {
             Map.Entry<Vertex<K, T>, PathInfo<K, T>> minVertex = getMinPath(paths);
             //minVertex离开桌面
             selectedPaths.put(minVertex.getKey().value, minVertex.getValue());
@@ -269,25 +400,38 @@ public class ListGraph<K, T> extends Graph<K, T> {
             //对minVertex的outEdges进行松弛操作
             for (Edge<K, T> outEdge : minVertex.getKey().outEdges) {
                 //如果outEdge.to已经离开桌面了，就没必要更新路径了
-                if (selectedPaths.containsKey(outEdge.to.value) || outEdge.to.equals(beginVertex)) continue; // || outEdge.to.value.equals(beginVertex.value)
-                //旧的最短路径
-                PathInfo<K, T> oldPathInfo = paths.get(outEdge.to);
-//                K oldWeight = oldPathInfo.weight;
-                //新的可选路径，minVertex.getValue() + 边的路径
-                K newWeight = weightManager.add(minVertex.getValue().weight, outEdge.weight);
-                if (oldPathInfo == null || weightManager.compare(newWeight, oldPathInfo.weight) < 0){
-                    PathInfo<K, T> ktPathInfo = new PathInfo<>();
-                    ktPathInfo.weight = newWeight;
-                    //此处不能直接这样赋值，它所赋值的是数组的引用，但是这里需要创建一个新的数组，ktPathInfo.paths = minVertex.getValue().paths
-                    ktPathInfo.paths.addAll(minVertex.getValue().paths);
-                    ktPathInfo.paths.add(outEdge.info());
-                    paths.put(outEdge.to, ktPathInfo);
-                }
+                if (selectedPaths.containsKey(outEdge.to.value))
+                    continue; // || outEdge.to.value.equals(beginVertex.value)
+                //调用松弛方法
+                relaxForDijkstra(paths, minVertex.getValue(), outEdge);
             }
         }
-//        selectedPaths.remove(begin);
+        selectedPaths.remove(begin);
 
         return selectedPaths;
+    }
+
+    /**
+     * 松弛操作
+     *
+     * @param paths   存放要松弛的点，还没有离开桌面的点
+     * @param minPath edge 的from 的最短路径信息
+     * @param outEdge 即将要进行松弛的边
+     */
+    private void relaxForDijkstra(Map<Vertex<K, T>, PathInfo<K, T>> paths, PathInfo<K, T> minPath, Edge<K, T> outEdge) {
+        //旧的最短路径
+        PathInfo<K, T> oldPathInfo = paths.get(outEdge.to);
+//                K oldWeight = oldPathInfo.weight;
+        //新的可选路径，minVertex.getValue() + 边的路径
+        K newWeight = weightManager.add(minPath.weight, outEdge.weight);
+        if (oldPathInfo == null || weightManager.compare(newWeight, oldPathInfo.weight) < 0) {
+            PathInfo<K, T> ktPathInfo = new PathInfo<>();
+            ktPathInfo.weight = newWeight;
+            //此处不能直接这样赋值，它所赋值的是数组的引用，但是这里需要创建一个新的数组，ktPathInfo.paths = minVertex.getValue().paths
+            ktPathInfo.paths.addAll(minPath.paths);
+            ktPathInfo.paths.add(outEdge.info());
+            paths.put(outEdge.to, ktPathInfo);
+        }
     }
 
 //    @Override
@@ -335,9 +479,9 @@ public class ListGraph<K, T> extends Graph<K, T> {
         Iterator<Map.Entry<Vertex<K, T>, PathInfo<K, T>>> iterator = paths.entrySet().iterator();
         Map.Entry<Vertex<K, T>, PathInfo<K, T>> min = iterator.next();
 
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Map.Entry<Vertex<K, T>, PathInfo<K, T>> next = iterator.next();
-            if (weightManager.compare(next.getValue().weight, min.getValue().weight) < 0){
+            if (weightManager.compare(next.getValue().weight, min.getValue().weight) < 0) {
                 min = next;
             }
         }
@@ -363,7 +507,7 @@ public class ListGraph<K, T> extends Graph<K, T> {
 
         //取出堆顶元素，即是权重最小的边
         int verticesSize = vertices.size() - 1;
-        while (!heap.isEmpty() && edgeInfos.size() < verticesSize){
+        while (!heap.isEmpty() && edgeInfos.size() < verticesSize) {
             Edge<K, T> edge = heap.remove();
             if (visitedVertex.contains(edge.to)) continue;
             edgeInfos.add(edge.info());
@@ -376,7 +520,7 @@ public class ListGraph<K, T> extends Graph<K, T> {
 
     private Set<EdgeInfo<K, T>> kruskal() {
         int edgesSize = vertices.size() - 1;
-        if (edgesSize < 0){
+        if (edgesSize < 0) {
             return null;
         }
 
@@ -389,7 +533,7 @@ public class ListGraph<K, T> extends Graph<K, T> {
         //将所有的边放入小顶堆中，不断的取出权值最小的边，判断是否会构成环，若构成则放弃这条边，否则就加入结果集中
         Set<EdgeInfo<K, T>> edgeInfos = new HashSet<>();
         MinHeap<Edge<K, T>> heap = new MinHeap<>(edges, edgeComparator);
-        while (!heap.isEmpty() && edgeInfos.size() < edgesSize){
+        while (!heap.isEmpty() && edgeInfos.size() < edgesSize) {
             Edge<K, T> edge = heap.remove();
             if (vertexUnionFind.isSame(edge.from, edge.to)) continue;
             edgeInfos.add(edge.info());
