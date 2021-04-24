@@ -50,10 +50,10 @@ public abstract class Graph<K, T> {
     //最小生成树，K 代表权重
     public abstract Set<EdgeInfo<K, T>> mst();
 
-    //单源最短路径
+    //单源最短路径 Dijkstra算法 | bellmanFord算法
     public abstract Map<T, PathInfo<K, T>> shortestPath(T begin);
 
-    //多源最短路径
+    //多源最短路径 Floyd算法
     public abstract Map<T, Map<T, PathInfo<K, T>>> shortestPath();
 
     //K 权值
