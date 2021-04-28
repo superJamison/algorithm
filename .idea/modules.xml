@@ -26,6 +26,8 @@
       <module fileurl="file://$PROJECT_DIR$/19_贪心/19_贪心.iml" filepath="$PROJECT_DIR$/19_贪心/19_贪心.iml" />
       <module fileurl="file://$PROJECT_DIR$/20_分治/20_分治.iml" filepath="$PROJECT_DIR$/20_分治/20_分治.iml" />
       <module fileurl="file://$PROJECT_DIR$/20_动态规划/20_动态规划.iml" filepath="$PROJECT_DIR$/20_动态规划/20_动态规划.iml" />
+      <module fileurl="file://$PROJECT_DIR$/21_布隆过滤器/21_布隆过滤器.iml" filepath="$PROJECT_DIR$/21_布隆过滤器/21_布隆过滤器.iml" />
+      <module fileurl="file://$PROJECT_DIR$/22_跳表/22_跳表.iml" filepath="$PROJECT_DIR$/22_跳表/22_跳表.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/算法.iml" filepath="$PROJECT_DIR$/.idea/算法.iml" />
     </modules>
   </component>
