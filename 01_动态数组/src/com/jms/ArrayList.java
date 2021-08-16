@@ -1,7 +1,5 @@
 package com.jms;
 
-import java.util.Arrays;
-
 /**
  * 手动实现一个可扩容的数组
  *

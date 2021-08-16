@@ -186,7 +186,6 @@ public class AVLTree<T> extends BST<T> {
 
     /**
      * 左旋转
-     *
      * @param grand
      */
     private void rotateLeft(Node<T> grand) {
