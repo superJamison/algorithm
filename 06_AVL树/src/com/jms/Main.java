@@ -18,23 +18,23 @@ public class Main {
 
         test();
 
-//        Integer data[] = new Integer[]{
-//                310, 95, 483, 995, 341, 714, 686, 624, 924, 969, 271
-//        };
-//        AVLTree<Integer> tree = new AVLTree<>();
-//        for (int i = 0; i < data.length; i++) {
-//            tree.add(data[i]);
-////            System.out.println("【" + data[i] + "】");
-////            BinaryTrees.print(tree);
-////            System.out.println("\n------------------------");
-//        }
-//
-//        for (int i = 0; i < data.length; i++) {
-//            tree.remove(data[i]);
+        Integer data[] = new Integer[]{
+                310, 95, 483, 995, 341, 714, 686, 624, 924, 969, 271
+        };
+        AVLTree<Integer> tree = new AVLTree<>();
+        for (int i = 0; i < data.length; i++) {
+            tree.add(data[i]);
 //            System.out.println("【" + data[i] + "】");
 //            BinaryTrees.print(tree);
 //            System.out.println("\n------------------------");
-//        }
+        }
+
+        for (int i = 0; i < data.length; i++) {
+            tree.remove(data[i]);
+            System.out.println("【" + data[i] + "】");
+            BinaryTrees.print(tree);
+            System.out.println("\n------------------------");
+        }
     }
 
     private static void test() {

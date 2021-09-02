@@ -64,8 +64,8 @@ public class Main {
 
     public static void test3(){
         BinarySearchTree<Integer> tree = new BinarySearchTree<>();
-        for (int i = 0; i < 100; i++) {
-            tree.add((int)(Math.random() * 100));
+        for (int i = 0; i < 5000; i++) {
+            tree.add((int)(Math.random() * 10000));
         }
         BinaryTrees.print(tree);
     }
@@ -84,7 +84,7 @@ public class Main {
             @Override
             public boolean visit(Integer integer) {
                 System.out.print("_" + integer + "_");return false;
-                
+
             }
         });
         System.out.println("\n前序遍历：");
@@ -112,7 +112,7 @@ public class Main {
             }
         });
     }
-    
+
     public static void test5(){
         Integer data[] = new Integer[]{
                 7, 4, 9, 2, 5, 8, 10, 3, 12, 1, 11
@@ -229,6 +229,6 @@ public class Main {
     public static void main(String[] args) {
 //        BinarySearchTree<Person> integerBinarySearchTree1 = new BinarySearchTree<Person>(new PersonComparator1());
 //        BinarySearchTree<Person> integerBinarySearchTree2 = new BinarySearchTree<Person>();
-        test9();
+        test3();
     }
 }
