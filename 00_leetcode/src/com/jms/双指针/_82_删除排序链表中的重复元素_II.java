@@ -25,7 +25,35 @@ public class _82_删除排序链表中的重复元素_II {
         }
     }
 
+    /**
+     * 递归
+     */
     public static ListNode deleteDuplicates(ListNode head) {
+        if (head == null) return head;
+
+        return deleteNextRepeatNode(head);
+    }
+
+    private static ListNode deleteNextRepeatNode(ListNode node) {
+        if (node == null || node.next == null) return node;
+
+        if (node.next.val != node.val){
+            node.next = deleteNextRepeatNode(node.next);
+            return node;
+        }else {
+            int value = node.val;
+
+            while (node != null && node.val == value){
+                node = node.next;
+            }
+            return deleteNextRepeatNode(node);
+        }
+    }
+
+    /**
+     * 非递归
+     */
+    public static ListNode deleteDuplicates1(ListNode head) {
         if (head == null) return head;
 
         ListNode node = new ListNode(101, head);
