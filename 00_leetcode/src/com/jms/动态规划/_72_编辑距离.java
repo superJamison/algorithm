@@ -9,6 +9,43 @@ package com.jms.动态规划;
 public class _72_编辑距离 {
 
     public int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        if (word1 == null || "".equals(word1)) return n;
+        if (word2 == null || "".equals(word2)) return m;
+
+        char[] chars1 = word1.toCharArray();
+        char[] chars2 = word2.toCharArray();
+        // dp[i][j]将word1前i个字符串转换为word2前j个字符串所需的最少操作数
+        int[][] dp = new int[m + 1][n + 1];
+        dp[0][0] = 0;
+
+        // 第0行
+        for (int col = 1; col <= chars2.length; col++) {
+            dp[0][col] = col;
+        }
+        // 第0列
+        for (int row = 1; row <= chars1.length; row++) {
+            dp[row][0] = row;
+        }
+
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                int top = dp[i - 1][j] + 1;
+                int left = dp[i][j - 1] + 1;
+                int leftTop = dp[i - 1][j - 1];
+
+                if (chars1[i - 1] != chars2[j - 1]){
+                    leftTop++;
+                }
+
+                dp[i][j] = Math.min(leftTop, Math.min(top, left));
+            }
+        }
+        return dp[m][n];
+    }
+
+    public int minDistance1(String word1, String word2) {
         if (word1 == null || word2 == null){
             return 0;
         }
@@ -66,7 +103,7 @@ public class _72_编辑距离 {
                 // 由char1[0, row - 1)转化为char2[0, col - 1)所需要的操作数
                 int leftTop = dp[row - 1][col - 1];
                 // 若char1[row] == char2[col]则无需做任何操作，dp[row][col] = dp[row - 1][col - 1]
-                // 若char1[row] != char2[col]则无需做任何操作，dp[row][col] = dp[row - 1][col - 1] + 1
+                // 若char1[row] != char2[col]，则dp[row][col] = dp[row - 1][col - 1] + 1
                 if (chars1[row - 1] != chars2[col - 1]){
                     leftTop++;
                 }

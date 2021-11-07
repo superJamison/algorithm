@@ -15,9 +15,21 @@ public class _70_爬楼梯 {
     public static int climbStairs(int n) {
         if (n <= 2) return n;
 
-        int small = 1, big = 2;
-
+        int a = 1, b = 2;
         for (int i = 3; i <= n; i++) {
+            b = a + b;
+            a = b - a;
+        }
+
+        return b;
+    }
+
+    public static int climbStairs3(int n) {
+        if (n <= 2) return n;
+
+        int small = 1, big = 1;
+
+        for (int i = 2; i <= n; i++) {
             big = big + small;
             small = big - small;
         }

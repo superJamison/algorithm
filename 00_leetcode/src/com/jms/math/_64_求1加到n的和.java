@@ -13,11 +13,21 @@ public class _64_求1加到n的和 {
         System.out.println(5 << 2);
     }
 
-    int sum = 0;
     public int sumNums(int n) {
-        boolean b = n > 1 && sumNums(n - 1) > 0;
+        boolean b = n > 1 && (n += sumNums(n - 1)) > 0;
+        return n;
+    }
+
+    int sum = 0;
+    public int sumNums5(int n) {
+        boolean b = n > 1 && sumNums5(n - 1) > 0;
         sum += n;
         return sum;
+    }
+
+    public static int sumNums4(int n){
+//        (n * (n + 1)) / 2
+        return (n * n + n) >> 1;
     }
 
     public static int sumNums3(int n) {

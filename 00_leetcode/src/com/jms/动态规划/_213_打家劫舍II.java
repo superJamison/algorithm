@@ -14,6 +14,25 @@ public class _213_打家劫舍II {
 
     public static int rob(int[] nums) {
         int n = nums.length;
+        if (n == 1) return nums[0];
+        if (n == 2) return Math.max(nums[0], nums[1]);
+        if (n == 3) return Math.max(Math.max(nums[0], nums[1]), nums[2]);
+
+        return Math.max(robByRange(nums, 0, nums.length - 2), robByRange(nums, 1, nums.length - 1));
+    }
+
+    private static int robByRange(int[] nums, int begin, int end) {
+        int first = nums[begin], second = Math.max(nums[begin], nums[begin + 1]), temp;
+        for (int i = begin + 2; i <= end; i++) {
+            temp = second;
+            second = Math.max(second, first + nums[i]);
+            first = temp;
+        }
+        return second;
+    }
+
+    public static int rob2(int[] nums) {
+        int n = nums.length;
         if (nums == null || n == 0) return 0;
         if (n == 1) return nums[0];
         if (n == 2) return Math.max(nums[0], nums[1]);

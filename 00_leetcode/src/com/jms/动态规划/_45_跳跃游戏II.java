@@ -15,32 +15,29 @@ public class _45_跳跃游戏II {
     }
 
     public static int jump(int[] nums) {
-        if (nums == null || nums.length == 0) return -1;
-
-        // dp[i]表示走到i位置上一步的最远距离
-        int[] dp = new int[nums.length];
-        int count = 0;
-
-        for (int i = 0; i < nums.length; i++) {
-            int jump = nums[i] + i;
-            if (jump < dp.length) {
-                dp[jump] = dp[jump] == -1 ? i : dp[jump];
-            }else {
-                dp[dp.length - 1] = dp[dp.length - 1] == -1 ? i : dp[dp.length - 1];
+        int maxPosition = 0, result = 0, end = 0;
+        for (int i = 0; i < nums.length - 1; i++) {
+            maxPosition = Math.max(maxPosition, i + nums[i]);
+            // 已经跳到当前的最远距离了，表明这个位置就是这一步要跳跃的位置了。刷新下一个最远距离
+            if (i == end){
+                end = maxPosition;
+                result++;
             }
         }
+        return result;
+    }
 
-        for (int i = 0; i < dp.length; i++) {
-            System.out.print(dp[i] + "  ");
+    public static int jump2(int[] nums) {
+        int result = 0, maxPosition = 0, end = 0;
+
+        for (int i = 0; i < nums.length - 1; i++) {
+            maxPosition = Math.max(maxPosition, i + nums[i]);
+            if (i == end) {
+                end = maxPosition;
+                result++;
+            }
         }
-
-        int index = dp.length - 1;
-        while (index > 0) {
-            index = dp[index];
-            count++;
-        }
-
-        return count;
+        return result;
     }
 
     public static int jump1(int[] nums) {

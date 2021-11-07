@@ -11,12 +11,18 @@ import java.util.List;
 public class _7_整数反转 {
 
     public static void main(String[] args) {
-        System.out.println(reverse(1534236469));
+//        System.out.println(reverse(1534236469));
 //        System.out.println();
 
 //        System.out.println(Math.pow(-2, 31));
 //        System.out.println(Math.pow(2, 31));
 //        System.out.println(Integer.MAX_VALUE);
+
+        int i = 2;
+
+        i = i + 1;
+
+        System.out.println(i);
 
     }
 
